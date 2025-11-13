@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "duration": 15,
+    "label": "15s"
+  },
+  {
+    "id": 2,
+    "duration": 30,
+    "label": "30s"
+  },
+  {
+    "id": 3,
+    "duration": 60,
+    "label": "60s"
+  },
+  {
+    "id": 4,
+    "duration": 120,
+    "label": "120s"
+  }
+]
