@@ -7,6 +7,7 @@ import TypingTest from "@/components/TypingTest";
 import Settings from "@/components/Settings";
 import Results from "@/components/Results";
 import AuthModal from "@/components/AuthModal";
+import Leaderboard from "@/components/Leaderboard";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface Time {
@@ -18,6 +19,7 @@ interface Time {
 export default function HomePage() {
   const { user, logout } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [times, setTimes] = useState<Time[]>([]);
   const [sentences, setSentences] = useState<string[]>([]);
   const [selectedTime, setSelectedTime] = useState<number | null>(15);
@@ -109,6 +111,13 @@ export default function HomePage() {
 
         {/* Auth Section */}
         <div className="flex items-center gap-4">
+          <button
+            onClick={() => setShowLeaderboard(!showLeaderboard)}
+            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded transition-colors text-sm font-medium"
+          >
+            {showLeaderboard ? "Hide Leaderboard" : "🏆 Leaderboard"}
+          </button>
+          
           {user ? (
             <>
               <span className="text-sm text-gray-400">Welcome, {user.name}</span>
@@ -130,10 +139,17 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* Leaderboard Section */}
+      {showLeaderboard && (
+        <div className="mb-8 max-w-6xl w-full mx-auto">
+          <Leaderboard />
+        </div>
+      )}
+
       {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center">
-        {!showTest && !showResults && (
-          <>
+      <div className="flex-1 flex flex-col items-center justify-center px-4">
+        {!showTest && !showResults && !showLeaderboard && (
+          <div className="w-full max-w-4xl mx-auto">
             <Settings
               selectedTime={selectedTime}
               selectedWordCount={selectedWordCount}
@@ -141,40 +157,46 @@ export default function HomePage() {
               onWordCountChange={handleWordCountChange}
               times={times}
             />
-            <button
-              onClick={handleStartTest}
-              className="px-8 py-4 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-500 transition-colors text-xl"
-            >
-              Start Test
-            </button>
-          </>
+            <div className="flex justify-center mt-8">
+              <button
+                onClick={handleStartTest}
+                className="px-8 py-4 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-500 transition-colors text-xl"
+              >
+                Start Test
+              </button>
+            </div>
+          </div>
         )}
 
         {showTest && sentences.length > 0 && (
-          <TypingTest
-            sentences={sentences}
-            duration={selectedTime || 999999}
-            onComplete={handleTestComplete}
-            onReset={handleRestart}
-            mode={selectedTime !== null ? "time" : "words"}
-            limit={
-              selectedTime !== null ? selectedTime : selectedWordCount || 50
-            }
-          />
+          <div className="w-full max-w-4xl mx-auto">
+            <TypingTest
+              sentences={sentences}
+              duration={selectedTime || 999999}
+              onComplete={handleTestComplete}
+              onReset={handleRestart}
+              mode={selectedTime !== null ? "time" : "words"}
+              limit={
+                selectedTime !== null ? selectedTime : selectedWordCount || 50
+              }
+            />
+          </div>
         )}
 
         {showResults && (
-          <Results
-            wpm={results.wpm}
-            accuracy={results.accuracy}
-            correctChars={results.correctChars}
-            incorrectChars={results.incorrectChars}
-            onRestart={handleRestart}
-            mode={selectedTime !== null ? "time" : "words"}
-            limit={
-              selectedTime !== null ? selectedTime : selectedWordCount || 50
-            }
-          />
+          <div className="w-full max-w-4xl mx-auto">
+            <Results
+              wpm={results.wpm}
+              accuracy={results.accuracy}
+              correctChars={results.correctChars}
+              incorrectChars={results.incorrectChars}
+              onRestart={handleRestart}
+              mode={selectedTime !== null ? "time" : "words"}
+              limit={
+                selectedTime !== null ? selectedTime : selectedWordCount || 50
+              }
+            />
+          </div>
         )}
       </div>
 

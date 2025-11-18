@@ -112,11 +112,11 @@ export default function TypingTest({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6">
+    <div className="w-full p-6 bg-gray-800 rounded-lg shadow-xl">
       {/* Mode Display */}
-      <div className="mb-4 text-center">
-        <div className="text-sm text-gray-400 mb-2">Test Mode</div>
-        <div className="text-lg font-medium text-yellow-400">
+      <div className="mb-6 text-center">
+        <div className="text-sm text-gray-400 mb-2 uppercase tracking-wider">Test Mode</div>
+        <div className="text-xl font-semibold text-yellow-400">
           {mode === "time" ? `${limit} seconds` : `${limit} words`}
         </div>
       </div>
@@ -124,12 +124,16 @@ export default function TypingTest({
       {/* Timer Display - Only show for time-based tests */}
       {mode === "time" && (
         <div className="mb-6 text-center">
-          <div className="text-5xl font-bold text-yellow-400">{timeLeft}s</div>
+          <div className={`text-6xl font-bold transition-colors ${
+            timeLeft <= 10 ? "text-red-400" : "text-yellow-400"
+          }`}>
+            {timeLeft}s
+          </div>
         </div>
       )}
 
       {/* Text Display */}
-      <div className="bg-gray-800 rounded-lg p-6 mb-4 min-h-[200px] max-h-[400px] overflow-y-auto text-xl leading-relaxed wrap-break-word">
+      <div className="bg-gray-900 rounded-lg p-8 mb-6 min-h-[250px] max-h-[400px] overflow-y-auto text-2xl leading-relaxed wrap-break-word border border-gray-700">
         {text.split("").map((char, index) => (
           <span key={index} className={getCharacterColor(index)}>
             {char}
@@ -144,7 +148,7 @@ export default function TypingTest({
         value={userInput}
         onChange={handleInputChange}
         disabled={isFinished}
-        className="w-full p-4 text-lg bg-gray-700 text-white rounded-lg border-2 border-gray-600 focus:border-yellow-400 focus:outline-none disabled:opacity-50"
+        className="w-full p-5 text-xl bg-gray-700 text-white rounded-lg border-2 border-gray-600 focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         placeholder="Start typing here..."
         autoFocus
       />
@@ -153,9 +157,9 @@ export default function TypingTest({
       <div className="mt-6 text-center">
         <button
           onClick={handleRestart}
-          className="px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-500 transition-colors"
+          className="px-8 py-3 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-600 transition-all hover:scale-105"
         >
-          Restart Test
+          ↻ Restart Test
         </button>
       </div>
     </div>
