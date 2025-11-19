@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb';
+import { ObjectId } from "mongodb";
 
 export interface User {
   _id?: ObjectId;
@@ -16,7 +16,7 @@ export interface TestResult {
   accuracy: number;
   correctChars: number;
   incorrectChars: number;
-  mode: 'time' | 'words';
+  mode: "time" | "words";
   limit: number;
   completedAt: Date;
 }

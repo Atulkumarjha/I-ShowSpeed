@@ -37,21 +37,24 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Load token from localStorage on mount
-  useEffect(() => {
-    const storedToken = localStorage.getItem("auth_token");
-    const storedUser = localStorage.getItem("auth_user");
-
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+  const [token, setToken] = useState<string | null>(() => {
+    try {
+      return typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+    } catch {
+      return null;
     }
-    setIsLoading(false);
-  }, []);
+  });
+
+  const [user, setUser] = useState<User | null>(() => {
+    try {
+      const storedUser = typeof window !== "undefined" ? localStorage.getItem("auth_user") : null;
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const login = async (email: string, password: string) => {
     try {
@@ -74,7 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       return { success: true };
     } catch {
-      return { success: false, error: 'Network error' };
+      return { success: false, error: "Network error" };
     }
   };
 
@@ -95,7 +98,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       // Auto login after signup
       return await login(email, password);
     } catch {
-      return { success: false, error: 'Network error' };
+      return { success: false, error: "Network error" };
     }
   };
 

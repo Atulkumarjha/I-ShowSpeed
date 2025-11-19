@@ -16,14 +16,17 @@ interface LeaderboardProps {
   limit?: number;
 }
 
-export default function Leaderboard({ mode = "time", limit = 15 }: LeaderboardProps) {
+export default function Leaderboard({
+  mode = "time",
+  limit = 15,
+}: LeaderboardProps) {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedMode, setSelectedMode] = useState<"time" | "words">(mode);
 
   useEffect(() => {
     let mounted = true;
-    
+
     const fetchLeaderboard = async () => {
       setIsLoading(true);
       try {
@@ -57,7 +60,7 @@ export default function Leaderboard({ mode = "time", limit = 15 }: LeaderboardPr
         <h2 className="text-4xl font-bold text-yellow-400 flex items-center gap-3">
           🏆 Leaderboard
         </h2>
-        
+
         {/* Mode Toggle */}
         <div className="flex gap-3">
           <button
@@ -137,7 +140,13 @@ export default function Leaderboard({ mode = "time", limit = 15 }: LeaderboardPr
                           : "text-gray-500"
                       }`}
                     >
-                      {index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `#${index + 1}`}
+                      {index === 0
+                        ? "🥇"
+                        : index === 1
+                        ? "🥈"
+                        : index === 2
+                        ? "🥉"
+                        : `#${index + 1}`}
                     </span>
                   </td>
                   <td className="px-6 py-5 text-left font-semibold text-white text-lg">
