@@ -115,7 +115,9 @@ export default function TypingTest({
     <div className="w-full p-6 bg-gray-800 rounded-lg shadow-xl">
       {/* Mode Display */}
       <div className="mb-6 text-center">
-        <div className="text-sm text-gray-400 mb-2 uppercase tracking-wider">Test Mode</div>
+        <div className="text-sm text-gray-400 mb-2 uppercase tracking-wider">
+          Test Mode
+        </div>
         <div className="text-xl font-semibold text-yellow-400">
           {mode === "time" ? `${limit} seconds` : `${limit} words`}
         </div>
@@ -124,9 +126,11 @@ export default function TypingTest({
       {/* Timer Display - Only show for time-based tests */}
       {mode === "time" && (
         <div className="mb-6 text-center">
-          <div className={`text-6xl font-bold transition-colors ${
-            timeLeft <= 10 ? "text-red-400" : "text-yellow-400"
-          }`}>
+          <div
+            className={`text-6xl font-bold transition-colors ${
+              timeLeft <= 10 ? "text-red-400" : "text-yellow-400"
+            }`}
+          >
             {timeLeft}s
           </div>
         </div>

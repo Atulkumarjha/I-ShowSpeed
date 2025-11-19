@@ -70,7 +70,17 @@ export default function Results({
           // Silently fail if save fails
         });
     }
-  }, [user, token, saved, wpm, accuracy, correctChars, incorrectChars, mode, limit]);
+  }, [
+    user,
+    token,
+    saved,
+    wpm,
+    accuracy,
+    correctChars,
+    incorrectChars,
+    mode,
+    limit,
+  ]);
   return (
     <div className="w-full p-8 bg-gray-800 rounded-lg shadow-xl">
       <h2 className="text-4xl font-bold text-center mb-8 text-yellow-400">
@@ -88,19 +98,25 @@ export default function Results({
               <div className="text-3xl font-bold text-white mb-1">
                 {userStats.totalTests}
               </div>
-              <div className="text-gray-400 text-xs uppercase tracking-wider">Total Tests</div>
+              <div className="text-gray-400 text-xs uppercase tracking-wider">
+                Total Tests
+              </div>
             </div>
             <div className="p-4 bg-gray-800 rounded-lg">
               <div className="text-3xl font-bold text-yellow-400 mb-1">
                 {userStats.averageWpm}
               </div>
-              <div className="text-gray-400 text-xs uppercase tracking-wider">Average WPM</div>
+              <div className="text-gray-400 text-xs uppercase tracking-wider">
+                Average WPM
+              </div>
             </div>
             <div className="p-4 bg-gray-800 rounded-lg">
               <div className="text-3xl font-bold text-green-400 mb-1">
                 {userStats.bestWpm}
               </div>
-              <div className="text-gray-400 text-xs uppercase tracking-wider">Best WPM</div>
+              <div className="text-gray-400 text-xs uppercase tracking-wider">
+                Best WPM
+              </div>
             </div>
           </div>
           {saved && (
@@ -125,7 +141,9 @@ export default function Results({
           <div className="text-6xl font-bold text-green-400 mb-3">
             {accuracy.toFixed(1)}%
           </div>
-          <div className="text-gray-300 text-sm uppercase tracking-wider font-semibold">Accuracy</div>
+          <div className="text-gray-300 text-sm uppercase tracking-wider font-semibold">
+            Accuracy
+          </div>
         </div>
 
         {/* Correct Characters */}
