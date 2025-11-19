@@ -22,6 +22,7 @@ export default function HomePage() {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [times, setTimes] = useState<Time[]>([]);
   const [sentences, setSentences] = useState<string[]>([]);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("en");
   const [selectedTime, setSelectedTime] = useState<number | null>(15);
   const [selectedWordCount, setSelectedWordCount] = useState<number | null>(
     null
@@ -48,14 +49,14 @@ export default function HomePage() {
       .catch((err) => console.error("Error loading times:", err));
   }, []);
 
-  // Load sentences based on selected word count or default to 50
+  // Load sentences based on selected word count and language
   useEffect(() => {
     const wordCount = selectedWordCount || 50;
-    fetch(`/data/${wordCount}words.json`)
+    fetch(`/data/${selectedLanguage}/${wordCount}words.json`)
       .then((res) => res.json())
       .then((data) => setSentences(data))
       .catch((err) => console.error("Error loading sentences:", err));
-  }, [selectedWordCount]);
+  }, [selectedWordCount, selectedLanguage]);
 
   // Handle time selection (deselects word count)
   const handleTimeChange = (duration: number) => {
@@ -67,6 +68,11 @@ export default function HomePage() {
   const handleWordCountChange = (count: number) => {
     setSelectedWordCount(count);
     setSelectedTime(null);
+  };
+
+  // Handle language change
+  const handleLanguageChange = (language: string) => {
+    setSelectedLanguage(language);
   };
 
   const handleStartTest = () => {
@@ -153,8 +159,10 @@ export default function HomePage() {
             <Settings
               selectedTime={selectedTime}
               selectedWordCount={selectedWordCount}
+              selectedLanguage={selectedLanguage}
               onTimeChange={handleTimeChange}
               onWordCountChange={handleWordCountChange}
+              onLanguageChange={handleLanguageChange}
               times={times}
             />
             <div className="flex justify-center mt-8">

@@ -9,18 +9,30 @@ interface Time {
 interface SettingsProps {
   selectedTime: number | null;
   selectedWordCount: number | null;
+  selectedLanguage: string;
   onTimeChange: (duration: number) => void;
   onWordCountChange: (count: number) => void;
+  onLanguageChange: (language: string) => void;
   times: Time[];
 }
 
 export default function Settings({
   selectedTime,
   selectedWordCount,
+  selectedLanguage,
   onTimeChange,
   onWordCountChange,
+  onLanguageChange,
   times,
 }: SettingsProps) {
+  const languages = [
+    { code: "en", label: "English", flag: "🇬🇧" },
+    { code: "es", label: "Spanish", flag: "🇪🇸" },
+    { code: "fr", label: "French", flag: "🇫🇷" },
+    { code: "de", label: "German", flag: "🇩🇪" },
+    { code: "it", label: "Italian", flag: "🇮🇹" },
+  ];
+
   const wordCounts = [
     { count: 50, label: "50" },
     { count: 100, label: "100" },
@@ -31,6 +43,32 @@ export default function Settings({
   return (
     <div className="w-full">
       <div className="flex flex-col gap-8">
+        {/* Language Selection */}
+        <div className="flex flex-col gap-3 items-center">
+          <label className="text-sm text-gray-400 font-medium uppercase tracking-wider">
+            🌍 Language
+          </label>
+          <div className="flex gap-3 flex-wrap justify-center">
+            {languages.map((lang) => (
+              <button
+                key={lang.code}
+                onClick={() => onLanguageChange(lang.code)}
+                className={`px-5 py-2.5 rounded-lg font-semibold transition-all flex items-center gap-2 ${
+                  selectedLanguage === lang.code
+                    ? "bg-yellow-400 text-gray-900 scale-105 shadow-lg"
+                    : "bg-gray-700 text-gray-300 hover:bg-gray-600 hover:scale-105"
+                }`}
+              >
+                <span className="text-xl">{lang.flag}</span>
+                <span>{lang.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="w-full h-px bg-gray-700"></div>
+
         {/* Mode Toggle */}
         <div className="text-center">
           <p className="text-gray-400 text-sm mb-3">Choose test mode:</p>
