@@ -34,7 +34,11 @@ export default function TypingTest({
   const [timeLeft, setTimeLeft] = useState(duration);
   const [isActive, setIsActive] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const lastTypingTimeRef = useRef<number>(Date.now());
+  const textDisplayRef = useRef<HTMLDivElement>(null);
+  const currentCharRef = useRef<HTMLSpanElement>(null);
 
   const calculateResults = useCallback(() => {
     const typedChars = userInput.length;
@@ -54,7 +58,7 @@ export default function TypingTest({
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
-    if (isActive && timeLeft > 0) {
+    if (isActive && timeLeft > 0 && !isPaused) {
       interval = setInterval(() => {
         setTimeLeft((time) => {
           if (time <= 1) {
@@ -70,7 +74,25 @@ export default function TypingTest({
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isActive, timeLeft]);
+  }, [isActive, timeLeft, isPaused]);
+
+  // AFK detection - pause after 5 seconds of inactivity
+  useEffect(() => {
+    let afkCheckInterval: NodeJS.Timeout | null = null;
+
+    if (isActive && !isFinished) {
+      afkCheckInterval = setInterval(() => {
+        const timeSinceLastTyping = Date.now() - lastTypingTimeRef.current;
+        if (timeSinceLastTyping >= 5000 && !isPaused) {
+          setIsPaused(true);
+        }
+      }, 1000);
+    }
+
+    return () => {
+      if (afkCheckInterval) clearInterval(afkCheckInterval);
+    };
+  }, [isActive, isFinished, isPaused]);
 
   // Trigger results when finished
   useEffect(() => {
@@ -82,12 +104,34 @@ export default function TypingTest({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
+    // Update last typing time and resume if paused
+    lastTypingTimeRef.current = Date.now();
+    if (isPaused) {
+      setIsPaused(false);
+    }
+
     // Start timer on first keypress
     if (!isActive && !isFinished) {
       setIsActive(true);
     }
 
     setUserInput(value);
+
+    // Auto-scroll to keep cursor in view
+    if (currentCharRef.current && textDisplayRef.current) {
+      const charElement = currentCharRef.current;
+      const container = textDisplayRef.current;
+      const charRect = charElement.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      
+      // Check if current character is near the bottom (last line visible)
+      const isNearBottom = charRect.bottom > containerRect.bottom - 60;
+      
+      if (isNearBottom) {
+        // Scroll by one line height (approximately 3rem = 48px for text-2xl with leading-relaxed)
+        container.scrollTop += 48;
+      }
+    }
 
     // Check if user completed the text
     if (value.length >= text.length) {
@@ -96,11 +140,19 @@ export default function TypingTest({
     }
   };
 
+  const handleResume = () => {
+    setIsPaused(false);
+    lastTypingTimeRef.current = Date.now();
+    inputRef.current?.focus();
+  };
+
   const handleRestart = () => {
     setUserInput("");
     setTimeLeft(duration);
     setIsActive(false);
     setIsFinished(false);
+    setIsPaused(false);
+    lastTypingTimeRef.current = Date.now();
     onReset();
     inputRef.current?.focus();
   };
@@ -133,14 +185,40 @@ export default function TypingTest({
           >
             {timeLeft}s
           </div>
+          {isPaused && (
+            <div className="mt-3 text-orange-400 font-semibold animate-pulse">
+              ⏸️ Paused - Start typing to resume
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* AFK Pause Warning for word mode */}
+      {mode === "words" && isPaused && (
+        <div className="mb-6 text-center">
+          <div className="text-orange-400 font-semibold animate-pulse text-xl">
+            ⏸️ Paused - Start typing to resume
+          </div>
         </div>
       )}
 
       {/* Text Display */}
-      <div className="bg-gray-900 rounded-lg p-8 mb-6 min-h-[250px] max-h-[400px] overflow-y-auto text-2xl leading-relaxed wrap-break-word border border-gray-700">
+      <div 
+        ref={textDisplayRef}
+        className="bg-gray-900 rounded-lg p-8 mb-6 h-60 overflow-hidden text-2xl leading-relaxed wrap-break-word border border-gray-700"
+        style={{ lineHeight: '3rem' }}
+      >
         {text.split("").map((char, index) => (
-          <span key={index} className={getCharacterColor(index)}>
-            {char}
+          <span 
+            key={index}
+            ref={index === userInput.length ? currentCharRef : null}
+          >
+            {index === userInput.length && isActive && (
+              <span className="text-yellow-400 animate-pulse">|</span>
+            )}
+            <span className={getCharacterColor(index)}>
+              {char}
+            </span>
           </span>
         ))}
       </div>
@@ -152,8 +230,10 @@ export default function TypingTest({
         value={userInput}
         onChange={handleInputChange}
         disabled={isFinished}
-        className="w-full p-5 text-xl bg-gray-700 text-white rounded-lg border-2 border-gray-600 focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-        placeholder="Start typing here..."
+        className={`w-full p-5 text-xl bg-gray-700 text-white rounded-lg border-2 ${
+          isPaused ? 'border-orange-400' : 'border-gray-600'
+        } focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all`}
+        placeholder={isPaused ? "Click here or start typing to resume..." : "Start typing here..."}
         autoFocus
       />
 
