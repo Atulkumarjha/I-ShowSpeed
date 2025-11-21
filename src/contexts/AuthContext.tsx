@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 interface User {
   _id: string;
@@ -21,6 +21,7 @@ interface AuthContextType {
     password: string
   ) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
+  mounted: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -36,27 +37,23 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [token, setToken] = useState<string | null>(() => {
-    try {
-      return typeof window !== "undefined"
-        ? localStorage.getItem("auth_token")
-        : null;
-    } catch {
-      return null;
-    }
-  });
+  const [mounted, setMounted] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
-  const [user, setUser] = useState<User | null>(() => {
+  useEffect(() => {
+    // Load auth state from localStorage after mount
+    setMounted(true);
     try {
-      const storedUser =
-        typeof window !== "undefined"
-          ? localStorage.getItem("auth_user")
-          : null;
-      return storedUser ? JSON.parse(storedUser) : null;
-    } catch {
-      return null;
+      const storedToken = localStorage.getItem("auth_token");
+      const storedUser = localStorage.getItem("auth_user");
+      
+      if (storedToken) setToken(storedToken);
+      if (storedUser) setUser(JSON.parse(storedUser));
+    } catch (error) {
+      console.error("Failed to load auth state:", error);
     }
-  });
+  }, []);
 
   const login = async (email: string, password: string) => {
     try {
@@ -112,7 +109,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, token, login, signup, logout, mounted }}>
       {children}
     </AuthContext.Provider>
   );

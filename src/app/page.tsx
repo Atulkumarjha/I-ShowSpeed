@@ -18,7 +18,7 @@ interface Time {
 }
 
 export default function HomePage() {
-  const { user, logout } = useAuth();
+  const { user, logout, mounted } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [times, setTimes] = useState<Time[]>([]);
@@ -143,7 +143,7 @@ export default function HomePage() {
             {theme === 'light' ? '🌙' : '☀️'}
           </button>
 
-          {user ? (
+          {mounted && user ? (
             <>
               <span className="text-sm text-gray-400">
                 Welcome, {user.name}
@@ -155,13 +155,15 @@ export default function HomePage() {
                 Logout
               </button>
             </>
-          ) : (
+          ) : mounted ? (
             <button
               onClick={() => setShowAuthModal(true)}
               className="px-4 py-2 bg-yellow-400 text-black font-semibold rounded hover:bg-yellow-500 transition-colors text-sm"
             >
               Login / Sign Up
             </button>
+          ) : (
+            <div className="px-4 py-2 w-32"></div>
           )}
         </div>
       </div>
