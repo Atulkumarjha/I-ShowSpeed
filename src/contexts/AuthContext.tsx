@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 interface User {
   _id: string;
@@ -21,7 +21,6 @@ interface AuthContextType {
     password: string
   ) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
-  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,7 +38,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [token, setToken] = useState<string | null>(() => {
     try {
-      return typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+      return typeof window !== "undefined"
+        ? localStorage.getItem("auth_token")
+        : null;
     } catch {
       return null;
     }
@@ -47,14 +48,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const [user, setUser] = useState<User | null>(() => {
     try {
-      const storedUser = typeof window !== "undefined" ? localStorage.getItem("auth_user") : null;
+      const storedUser =
+        typeof window !== "undefined"
+          ? localStorage.getItem("auth_user")
+          : null;
       return storedUser ? JSON.parse(storedUser) : null;
     } catch {
       return null;
     }
   });
-
-  const [isLoading, setIsLoading] = useState(false);
 
   const login = async (email: string, password: string) => {
     try {
@@ -110,9 +112,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, token, login, signup, logout, isLoading }}
-    >
+    <AuthContext.Provider value={{ user, token, login, signup, logout }}>
       {children}
     </AuthContext.Provider>
   );

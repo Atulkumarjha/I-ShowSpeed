@@ -1,5 +1,7 @@
 "use client";
 
+import { useTheme } from "@/contexts/ThemeContext";
+
 interface Time {
   id: number;
   duration: number;
@@ -25,6 +27,8 @@ export default function Settings({
   onLanguageChange,
   times,
 }: SettingsProps) {
+  const { theme } = useTheme();
+  
   const languages = [
     { code: "en", label: "English", flag: "🇬🇧" },
     { code: "es", label: "Spanish", flag: "🇪🇸" },
@@ -40,12 +44,18 @@ export default function Settings({
     { count: 200, label: "200" },
   ];
 
+  const getBgClass = () => theme === 'light' ? 'bg-gray-200' : 'bg-gray-700';
+  const getBgHoverClass = () => theme === 'light' ? 'hover:bg-gray-300' : 'hover:bg-gray-600';
+  const getTextClass = () => theme === 'light' ? 'text-gray-700' : 'text-gray-300';
+  const getTextSecondaryClass = () => theme === 'light' ? 'text-gray-500' : 'text-gray-400';
+  const getBorderClass = () => theme === 'light' ? 'bg-gray-300' : 'bg-gray-700';
+
   return (
     <div className="w-full">
       <div className="flex flex-col gap-8">
         {/* Language Selection */}
         <div className="flex flex-col gap-3 items-center">
-          <label className="text-sm text-gray-400 font-medium uppercase tracking-wider">
+          <label className={`text-sm font-medium uppercase tracking-wider ${getTextSecondaryClass()}`}>
             🌍 Language
           </label>
           <div className="flex gap-3 flex-wrap justify-center">
@@ -56,7 +66,7 @@ export default function Settings({
                 className={`px-5 py-2.5 rounded-lg font-semibold transition-all flex items-center gap-2 ${
                   selectedLanguage === lang.code
                     ? "bg-yellow-400 text-gray-900 scale-105 shadow-lg"
-                    : "bg-gray-700 text-gray-300 hover:bg-gray-600 hover:scale-105"
+                    : `${getBgClass()} ${getTextClass()} ${getBgHoverClass()} hover:scale-105`
                 }`}
               >
                 <span className="text-xl">{lang.flag}</span>
@@ -67,11 +77,11 @@ export default function Settings({
         </div>
 
         {/* Divider */}
-        <div className="w-full h-px bg-gray-700"></div>
+        <div className={`w-full h-px ${getBorderClass()}`}></div>
 
         {/* Mode Toggle */}
         <div className="text-center">
-          <p className="text-gray-400 text-sm mb-3">Choose test mode:</p>
+          <p className={`text-sm mb-3 ${getTextSecondaryClass()}`}>Choose test mode:</p>
           <div className="flex gap-4 items-center justify-center">
             <span
               className={`font-medium text-lg ${
@@ -94,7 +104,7 @@ export default function Settings({
         <div className="flex flex-col lg:flex-row gap-8 items-center justify-center">
           {/* Time Selection */}
           <div className="flex flex-col gap-3 items-center">
-            <label className="text-sm text-gray-400 font-medium">
+            <label className={`text-sm font-medium ${getTextSecondaryClass()}`}>
               Time (seconds)
             </label>
             <div className="flex gap-3">
@@ -105,7 +115,7 @@ export default function Settings({
                   className={`px-6 py-3 rounded-lg font-semibold transition-all ${
                     selectedTime === time.duration
                       ? "bg-yellow-400 text-gray-900 scale-105 shadow-lg"
-                      : "bg-gray-700 text-gray-300 hover:bg-gray-600 hover:scale-105"
+                      : `${getBgClass()} ${getTextClass()} ${getBgHoverClass()} hover:scale-105`
                   }`}
                 >
                   {time.label}
@@ -115,11 +125,11 @@ export default function Settings({
           </div>
 
           {/* Divider */}
-          <div className="hidden lg:block w-px h-20 bg-gray-700"></div>
+          <div className={`hidden lg:block w-px h-20 ${getBorderClass()}`}></div>
 
           {/* Word Count Selection */}
           <div className="flex flex-col gap-3 items-center">
-            <label className="text-sm text-gray-400 font-medium">Words</label>
+            <label className={`text-sm font-medium ${getTextSecondaryClass()}`}>Words</label>
             <div className="flex gap-3">
               {wordCounts.map((wc) => (
                 <button
@@ -128,7 +138,7 @@ export default function Settings({
                   className={`px-6 py-3 rounded-lg font-semibold transition-all ${
                     selectedWordCount === wc.count
                       ? "bg-yellow-400 text-gray-900 scale-105 shadow-lg"
-                      : "bg-gray-700 text-gray-300 hover:bg-gray-600 hover:scale-105"
+                      : `${getBgClass()} ${getTextClass()} ${getBgHoverClass()} hover:scale-105`
                   }`}
                 >
                   {wc.count}

@@ -9,6 +9,7 @@ import Results from "@/components/Results";
 import AuthModal from "@/components/AuthModal";
 import Leaderboard from "@/components/Leaderboard";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface Time {
   id: number;
@@ -18,8 +19,8 @@ interface Time {
 
 export default function HomePage() {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [times, setTimes] = useState<Time[]>([]);
   const [sentences, setSentences] = useState<string[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState<string>("en");
@@ -29,6 +30,7 @@ export default function HomePage() {
   );
   const [showTest, setShowTest] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [showLeaderboardView, setShowLeaderboardView] = useState(false);
   const [results, setResults] = useState({
     wpm: 0,
     accuracy: 0,
@@ -94,13 +96,20 @@ export default function HomePage() {
   const handleRestart = () => {
     setShowTest(false);
     setShowResults(false);
+    setShowLeaderboardView(false);
+  };
+
+  const handleShowLeaderboard = () => {
+    setShowTest(false);
+    setShowResults(false);
+    setShowLeaderboardView(true);
   };
 
   return (
-    <div className="min-h-screen flex flex-col p-4">
+    <div className="min-h-screen flex flex-col p-4" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       {/* Header */}
       <div className="flex items-center justify-between mt-10 mb-8 max-w-6xl w-full mx-auto">
-        <Link href="/">
+        <Link href="/" onClick={handleRestart} className="cursor-pointer">
           <h1 className="text-3xl font-normal flex flex-col">
             <div className="flex items-center gap-2 text-xs text-gray-400">
               <span>you can&apos;t see, If</span>
@@ -115,13 +124,23 @@ export default function HomePage() {
           </h1>
         </Link>
 
-        {/* Auth Section */}
+        {/* Navigation and Auth Section */}
         <div className="flex items-center gap-4">
+          {/* Leaderboard Navigation Button */}
           <button
-            onClick={() => setShowLeaderboard(!showLeaderboard)}
-            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded transition-colors text-sm font-medium"
+            onClick={handleShowLeaderboard}
+            className="px-4 py-2 bg-yellow-400 text-black font-semibold rounded hover:bg-yellow-500 transition-colors text-sm"
           >
-            {showLeaderboard ? "Hide Leaderboard" : "🏆 Leaderboard"}
+            🏆 Leaderboard
+          </button>
+
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded transition-colors text-xl"
+            aria-label="Toggle theme"
+          >
+            {theme === 'light' ? '🌙' : '☀️'}
           </button>
 
           {user ? (
@@ -147,16 +166,20 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Leaderboard Section */}
-      {showLeaderboard && (
-        <div className="mb-8 max-w-6xl w-full mx-auto">
-          <Leaderboard />
-        </div>
-      )}
-
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-center px-4">
-        {!showTest && !showResults && !showLeaderboard && (
+        {/* Dedicated Leaderboard View */}
+        {showLeaderboardView && (
+          <div className="w-full max-w-6xl mx-auto">
+            <div className="mb-6 text-center">
+              <h2 className="text-4xl font-bold text-yellow-400 mb-2">🏆 Global Leaderboard</h2>
+              <p className="text-gray-400">See how you rank against the best typists worldwide</p>
+            </div>
+            <Leaderboard />
+          </div>
+        )}
+
+        {!showTest && !showResults && !showLeaderboardView && (
           <div className="w-full max-w-4xl mx-auto">
             <Settings
               selectedTime={selectedTime}
@@ -206,6 +229,11 @@ export default function HomePage() {
                 selectedTime !== null ? selectedTime : selectedWordCount || 50
               }
             />
+            
+            {/* Leaderboard Section - Always visible after results */}
+            <div className="mt-8">
+              <Leaderboard />
+            </div>
           </div>
         )}
       </div>
